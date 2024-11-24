@@ -237,7 +237,7 @@ class PrimaryAgent(object):
             return f"Success. Workout name set to {trimmed}."
         else:
             self.workout.name = None
-            return "Success. Workout name cleared."
+            return "Success. Workout name was cleared."
 
         
     # ------------------------------
@@ -254,7 +254,7 @@ class PrimaryAgent(object):
         messages = state["messages"]
         last_message = messages[-1]
         
-        # If there is no function call, then we finish
+        # If there is a tool call, then we finish
         if isinstance(last_message, ToolMessage):
             return "end"
         # Otherwise if there is, we continue
@@ -266,29 +266,13 @@ class PrimaryAgent(object):
     # Define the function that calls the model
     def _call_model(self, state):
         messages = state["messages"]
-        #print(f'[DIAGNOSTIC] messages: {messages}')
-
         if isinstance(messages[-1], ToolMessage):
-            # We have to add an AI prompt here for SambaNova. Otherwise, it won't 
-            # know what to do. This should only be appended after a ToolMessage 
-            # because otherwise the LLM gets very chatty about irrelevant topics.
-            # This can be either AIMessage or SystemMessage. It doesn't matter.
-
             return None
         else:
-            response = self._call_llm(messages)
+            response = self.model.invoke(messages)
             
         # We return a list, because this will get added to the existing list
         return {"messages": [response]}
-
-    # I'm putting this here to print the type of messages that we're invoking
-    # This is the only place in the workflow where the LLM is queried
-    def _call_llm(self, messages):
-        # Uncomment these to show all of the message types being passed to the LLM
-        # message_types = [str(type(message)) for message in messages]
-        # print(f"[messages] [{', '.join(message_types)}]")
-        return self.model.invoke(messages) # Send back the response as usual
-
 
     def _create_workflow(self):
         """Get a new LangGraph workflow"""

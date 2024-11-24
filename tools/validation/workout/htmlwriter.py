@@ -17,10 +17,13 @@ class HTMLWriter(object):
 
     def _workout_to_html(self, workout: Workout) -> str:
         """Convert the Workout Object to basic HTML"""
-        result = '<div class="workout">'
-        if workout.name != None:
-            result += f'<div class="header"><span class="name">{workout.name}</span></div>'
-        result += '<ol>'
+        result = '<div class="workout"><div class="header"><div class="name"><span class="label">Name:&nbsp;</span>'
+
+        if workout.name is None:
+            result += f'<span class="value unnamed">Unnamed workout</span>'
+        else:
+            result += f'<span class="value named">{workout.name}</span>'
+        result += '</div></div><ol>'
 
         level = 1
         for step in workout.steps:
