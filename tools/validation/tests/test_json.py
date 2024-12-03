@@ -1,10 +1,11 @@
 import json
 import unittest
 
-import workout.steps
+import workout.steps as steps
 
 from .context import workout
 from workout import WorkoutDecoder, Workout
+from workout.utilities import collection_is_similar
 
 class TestJSONParsing(unittest.TestCase):
 
@@ -15,7 +16,7 @@ class TestJSONParsing(unittest.TestCase):
         self.assertEqual(len(parsed.steps), 1)
 
         parsed_step = parsed.steps[0]
-        self.assertEqual(type(parsed_step), workout.steps.RunWorkoutStep)
+        self.assertEqual(type(parsed_step), steps.RunWorkoutStep)
         self.assertEqual(parsed_step.value, 600)
         self.assertEqual(parsed_step.unit, 'seconds')
         self.assertEqual(parsed_step.notes, 'marathon pace')
@@ -38,8 +39,6 @@ class TestJSONParsing(unittest.TestCase):
         self.assertEqual(len(parsed.steps), 1)
 
         parsed_step = parsed.steps[0]
-        self.assertEqual(type(parsed_step), workout.steps.RepetitionStep)
-        self.assertEqual(parsed_step.value, 4)
 
         # Test each step
         expected_run = workout.steps.RunWorkoutStep(
@@ -55,9 +54,11 @@ class TestJSONParsing(unittest.TestCase):
         self.assertEqual(run.maximum, expected_run.maximum)
         self.assertEqual(run.unit, expected_run.unit)
         self.assertEqual(run.notes, expected_run.notes)
+        self.assertEqual(type(run), steps.RunWorkoutStep)
+        self.assertEqual(type(run), type(expected_run))
         self.assertTrue(run.similar(expected_run))
         
-        expected_rest = workout.steps.RestWorkoutStep(
+        expected_rest = steps.RestWorkoutStep(
                             value=60,
                             unit='seconds'
                         )
@@ -67,20 +68,34 @@ class TestJSONParsing(unittest.TestCase):
         self.assertEqual(rest.minimum, expected_rest.minimum)
         self.assertEqual(rest.maximum, expected_rest.maximum)
         self.assertEqual(rest.unit, expected_rest.unit)
+        self.assertIsNone(rest.notes)
+        self.assertIsNone(rest.goals)
+        self.assertEqual(type(rest), steps.RestWorkoutStep)
+        self.assertEqual(type(rest), type(expected_rest))
         self.assertTrue(rest.similar(expected_rest))
-        
-        # Test the repetition
-        self.assertTrue(
-            parsed_step.similar(
-                workout.steps.RepetitionStep(
+
+        expected_repetition = steps.RepetitionStep(
                     value=4,
                     steps=[
                         expected_run,
-                        expected_rest,
+                        expected_rest
                     ]
                 )
-            )
-        )
+
+        # Test the repetition
+        self.assertEqual(type(parsed_step), steps.RepetitionStep)
+        self.assertEqual(parsed_step.value, 4)
+        self.assertEqual(parsed_step.minimum, expected_repetition.minimum)
+        self.assertEqual(parsed_step.maximum, expected_repetition.maximum)
+        self.assertEqual(len(parsed_step.steps), 2)
+        self.assertEqual(len(parsed_step.steps), len(expected_repetition.steps))
+        self.assertIsNone(parsed_step.notes)
+        self.assertIsNone(parsed_step.goals)
+        self.assertEqual(type(parsed_step), type(expected_repetition))
+        self.assertTrue(parsed_step.steps[0].similar(expected_repetition.steps[0]))
+        self.assertTrue(parsed_step.steps[1].similar(expected_repetition.steps[1]))
+        self.assertTrue(collection_is_similar(parsed_step.steps, expected_repetition.steps))
+        self.assertTrue(parsed_step.similar(expected_repetition))
 
 
     def test_jack_daniels_type_plan(self):

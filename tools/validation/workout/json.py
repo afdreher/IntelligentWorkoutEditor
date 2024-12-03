@@ -6,12 +6,10 @@ from .constants import keys as KEYS
 from .constants import types as TYPES
 
 from .goals import AbstractWorkoutStepGoal, SpeedGoal, HeartRateGoal, HeartRateZoneGoal, CadenceGoal, PowerGoal, LapTimeGoal
-from .steps import AbstractWorkoutStep, WorkoutStep, RunWorkoutStep, RecoverWorkoutStep, RestWorkoutStep, WarmUpWorkoutStep, CoolDownWorkoutStep
-from .steps import RepetitionStep
+from .steps import AbstractWorkoutStep, RunWorkoutStep, RecoverWorkoutStep, RepetitionStep, RestWorkoutStep, WarmUpWorkoutStep, CoolDownWorkoutStep
 from .workout import Workout
 
 from .exceptions import InvalidGoalTypeError, InvalidStepTypeError
-
 
 
 # Encode / Decode
@@ -223,59 +221,3 @@ class WorkoutDecoder(json.JSONDecoder):
                 return LapTimeGoal(**args)
                   
         raise InvalidGoalTypeError(step_type)
-        # return f'WORKOUT GOAL: <{step_type}, {data}>'
-
-        # if KEYS.TYPE in data:
-        #     # It should be a step or a repetition...
-
-        #     # If it has goals, lets try to decode those...
-
-        #     goal_type = goal_type.lower()
-        #     if goal_type not in STEP_GOAL_TYPES.keys():
-        #         # Perform a fuzzy Levenshtein distance match to allow for a few spelling errors, etc.
-        #         extracted = selectFuzzyMatch(goal_type, STEP_GOAL_TYPES.keys())
-        #         if extracted is None:
-        #             raise RuntimeError("Invalid goal type {}".format(goal_type))
-        #         goal_type = extracted[0]
-        #     self.goal_type = goal_type
-
-        # # if 'Actor' in dct:
-        # #     actor = Actor(dct['Actor']['Name'], dct['Actor']['Age'], '')
-        # #     movie = Movie(dct['Movie']['Title'], dct['Movie']['Gross'], '', dct['Movie']['Year'])
-        # #     return Edge(actor, movie)
-        # return data
-    
-
-# # Move this to encode / decode! 
-# def to_dict(self):
-#     data = { KEYS.TYPE: goal_type }
-#     if value is not None:
-#         data[VALUE_KEY] = value
-#     if min is not None:
-#         data[MINIMUM_KEY] = self.min
-#     if max is not None:
-#         data[MAXIMUM_KEY] = self.max
-#     return data
-    
-# @classmethod
-# def from_dict(cls, data) -> Self:
-#     goal_type = get_type_from_dict(data)
-#     (minimum, maximum, value) = get_limits(data)
-#     return WorkoutStepGoal(goal_type, value, minimum, maximum)
-
-        
-    # def from_dict(data) -> Self | None:
-    #     if hasattr(data, NAME_KEY):
-    #         name = data.get(name)
-    #         # Process the steps
-    #         steps = [from_dict(x) for x in data.get(STEPS_KEY, [])]
-    #         return Workout(steps, name)
-    #     if type(data) is list:
-    #         # Process this as the steps...
-    #         steps = [from_dict(x) for x in data]
-    #         return Workout(steps)
-    #     # Else see if it's a workout of some variety...
-    #     if hasattr(data, KEYS.TYPE):
-    #         steps = [from_dict(data)]
-    #         return Workout(steps)
-    #     return None
