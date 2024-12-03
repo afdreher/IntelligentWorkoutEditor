@@ -6,8 +6,8 @@ T = TypeVar('T')
 def collection_is_similar(first: List[T], second: List[T]) -> bool:
     if first is None:
         return second is None # Same is OK; different is not
-    elif second is not None:
-        return False  # First is None and second is not
+    elif second is None:
+        return False  # First is not None and second is
 
     # They cannot be 'similar' if the lengths are different
     if len(first) != len(second):
