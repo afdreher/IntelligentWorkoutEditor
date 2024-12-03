@@ -30,10 +30,13 @@ class AbstractWorkoutStep(WorkoutObject):
         self.maximum = maximum
 
         self.notes = notes
-        if isinstance(goals, WorkoutStepGoals):
-            self.goals = goals
+        if goals is not None:
+            if isinstance(goals, WorkoutStepGoals):
+                self.goals = goals
+            else:
+                self.goals = WorkoutStepGoals.from_list(goals)
         else:
-            self.goals = WorkoutStepGoals.from_list(goals)
+            self.goals = None
         # Goals should be a structure because there can only be one of each type
         # Also note that Garmin only supports 1 goal per step, and does not support
         # goals for repetitions. These additions are used here to make the process
@@ -46,4 +49,5 @@ class AbstractWorkoutStep(WorkoutObject):
             self.minimum == other.minimum and \
             self.maximum == other.maximum and \
             self.notes == other.notes and \
+            (self.goals is None and other.goals is None) or \
             self.goals.similar(other.goals)
